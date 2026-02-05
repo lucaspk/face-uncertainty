@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encare a Incerteza</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-logo">Encare a Incerteza</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-section="coping-cards">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M9 3v18"/>
+                        </svg>
+                        Cartões
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="challenge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                        Desafios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="profile">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Perfil
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Coping Cards Section -->
+        <section id="coping-cards" class="section active">
+            <div class="container">
+                <!-- UX: Ritual-style introduction for emotional preparation -->
+                <div class="card-ritual-intro" style="display: none;">
+                    <h3>Um momento para você</h3>
+                    <p>Respire fundo. Estes cartões são lembretes gentis de que você tem a força necessária para enfrentar momentos difíceis. Navegue no seu ritmo.</p>
+                </div>
+
+                <div class="card-deck">
+                    <div class="deck-cover active">
+                        <div class="cover-content">
+                            <h1>Cartões de Enfrentamento</h1>
+                            <p>Anti-Pânico</p>
+                            <div class="cover-illustration">
+                                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </div>
+                            <button class="btn btn-primary" id="start-cards">Começar</button>
+                        </div>
+                    </div>
+                    <div class="card-viewer">
+                        <button class="card-nav card-nav-prev">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6"/>
+                            </svg>
+                        </button>
+                        <div class="card-container">
+                            <div class="coping-card"></div>
+                        </div>
+                        <button class="card-nav card-nav-next">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="card-counter">
+                        <span class="current-card">1</span> / <span class="total-cards">24</span>
+                    </div>
+                    <!-- UX: Visual progress dots for better navigation awareness -->
+                    <div class="card-progress-dots" id="card-progress-dots"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Challenge Section -->
+        <section id="challenge" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <!-- UX: Contextual subtitle for emotional framing -->
+                    <div class="section-subtitle">Crescimento pela Experiência</div>
+                    <h1>Desafio Abraçando a Incerteza</h1>
+                    <p class="section-description">Pequenas ações diárias que transformam sua relação com o desconhecido</p>
+                </div>
+
+                <!-- Reminders -->
+                <div class="reminders-grid">
+                    <div class="reminder-card">
+                        <h3>Abra-se para a mudança</h3>
+                        <p>A vida é dinâmica, e nem sempre podemos prever o que está por vir. A mudança é uma constante.</p>
+                    </div>
+                    <div class="reminder-card">
+                        <h3>Foque no que pode controlar</h3>
+                        <p>Concentre sua atenção naquilo que está ao seu alcance para cultivar um senso de capacidade.</p>
+                    </div>
+                    <div class="reminder-card">
+                        <h3>Aprenda com a incerteza</h3>
+                        <p>Veja as situações incertas como oportunidades de aprendizado e crescimento pessoal.</p>
+                    </div>
+                    <div class="reminder-card">
+                        <h3>Cultive a resiliência</h3>
+                        <p>Fortalecer sua resiliência permite que você se adapte mais facilmente às reviravoltas.</p>
+                    </div>
+                </div>
+
+                <!-- Challenges Grid -->
+                <div class="challenges-section">
+                    <h2>Escolha seu próximo passo</h2>
+                    <!-- UX: Inviting intro text for action-first hierarchy -->
+                    <p class="challenges-intro">Cada desafio é uma oportunidade de descobrir sua força. Comece onde você se sentir mais confortável.</p>
+                    <div class="challenges-grid" id="challenges-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <!-- UX: Contextual subtitle for progress narrative -->
+                    <div class="section-subtitle">Sua Jornada</div>
+                    <h1>Seu Progresso</h1>
+                    <p class="section-description">Cada passo que você dá é uma vitória. Celebre seu crescimento.</p>
+                </div>
+
+                <div class="profile-content">
+                    <!-- UX: Dynamic motivational narrative based on progress -->
+                    <div class="profile-narrative" id="profile-narrative">
+                        <h3>Continue brilhando! ✨</h3>
+                        <p>Você está construindo coragem, um desafio de cada vez.</p>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-value" id="profile-xp">0</div>
+                            <div class="stat-label">Pontos XP</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-value" id="profile-level">1</div>
+                            <div class="stat-label">Nível</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✓</div>
+                            <div class="stat-value" id="profile-completed">0</div>
+                            <div class="stat-label">Desafios Completos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎖️</div>
+                            <div class="stat-value" id="profile-badges">0</div>
+                            <div class="stat-label">Conquistas</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <h3>Progresso para o Próximo Nível</h3>
+                        <!-- UX: Motivational label for progress tracking -->
+                        <p class="progress-label">Você está cada vez mais perto de subir de nível!</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <p class="progress-text"><span id="current-xp">0</span> / <span id="next-level-xp">100</span> XP</p>
+                    </div>
+
+                    <div class="badges-section">
+                        <h3>Suas Conquistas</h3>
+                        <div class="badges-grid" id="badges-grid"></div>
+                    </div>
+
+                    <div class="data-management">
+                        <h3>Gerenciar Dados</h3>
+                        <div class="data-buttons">
+                            <button class="btn btn-secondary" id="export-data">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Exportar Dados
+                            </button>
+                            <button class="btn btn-secondary" id="import-data">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                Importar Dados
+                            </button>
+                            <input type="file" id="import-file" accept=".json" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Challenge Modal -->
+    <div class="modal" id="challenge-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <div class="modal-body">
+                <div class="challenge-header">
+                    <h2 id="modal-challenge-title"></h2>
+                    <div class="challenge-meta">
+                        <span class="challenge-category" id="modal-challenge-category"></span>
+                        <span class="challenge-difficulty" id="modal-challenge-difficulty"></span>
+                    </div>
+                </div>
+                <div class="challenge-description">
+                    <p id="modal-challenge-description"></p>
+                </div>
+                <!-- UX: Warm reflection section with conversational tone -->
+                <div class="reflection-section">
+                    <h3>Compartilhe sua experiência</h3>
+                    <p class="reflection-intro">Reserve um momento para refletir sobre o que viveu. Suas palavras aqui são apenas para você.</p>
+
+                    <div class="reflection-questions">
+                        <div class="question-group">
+                            <label>Que descobertas você fez sobre si mesmo?</label>
+                            <textarea class="reflection-input" data-question="learned" rows="3" placeholder="Escreva livremente o que vier à mente..."></textarea>
+                        </div>
+                        <div class="question-group">
+                            <label>Como foi comparado ao que você imaginou?</label>
+                            <textarea class="reflection-input" data-question="expected" rows="3" placeholder="Suas expectativas se confirmaram?"></textarea>
+                        </div>
+                        <div class="question-group">
+                            <label>O que surpreendeu você nessa experiência?</label>
+                            <textarea class="reflection-input" data-question="different" rows="3" placeholder="Houve algo inesperado?"></textarea>
+                        </div>
+                        <div class="question-group">
+                            <label>Como isso afetou sua confiança?</label>
+                            <textarea class="reflection-input" data-question="confidence" rows="3" placeholder="Você se sente mais preparado agora?"></textarea>
+                        </div>
+                        <div class="question-group">
+                            <label>O que isso revela sobre enfrentar o desconhecido?</label>
+                            <textarea class="reflection-input" data-question="lessons" rows="3" placeholder="Que lições você leva dessa experiência?"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <span class="modal-nav-hint">💡 Dica: Use Tab para navegar entre os campos</span>
+                        <button class="btn btn-primary" id="complete-challenge">Celebrar Conclusão</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
