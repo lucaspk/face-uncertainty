@@ -8,8 +8,10 @@ const app = {
 
     // Initialize the application
     init() {
+        this.initTheme();
         this.setupNavigation();
         this.setupCopingCards();
+        this.setupThemeToggle();
         gamification.init();
         this.loadSection(this.currentSection);
     },
@@ -249,6 +251,47 @@ const app = {
                     this.showCard(this.currentCardIndex);
                 }
             }
+        });
+    },
+
+    // Initialize theme from localStorage or system preference
+    initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        let theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+        this.setTheme(theme);
+    },
+
+    // Set theme
+    setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        
+        // Update toggle button icons
+        const lightIcon = document.querySelector('.theme-icon-light');
+        const darkIcon = document.querySelector('.theme-icon-dark');
+        
+        if (lightIcon && darkIcon) {
+            if (theme === 'dark') {
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+            } else {
+                lightIcon.style.display = 'block';
+                darkIcon.style.display = 'none';
+            }
+        }
+    },
+
+    // Setup theme toggle button
+    setupThemeToggle() {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (!themeToggle) return;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            this.setTheme(newTheme);
         });
     }
 };
