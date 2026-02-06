@@ -1,10 +1,10 @@
-# Face a Incerteza 🌱
+# Encare a Incerteza 🌱
 
 Uma aplicação web gamificada para desenvolver tolerância à incerteza através de cartões de enfrentamento anti-pânico e desafios diários baseados em Terapia Cognitivo-Comportamental (TCC).
 
 ## 📋 Sobre o Projeto
 
-**Face a Incerteza** é uma ferramenta de autoajuda psicológica que combina duas abordagens terapêuticas:
+**Encare a Incerteza** é uma ferramenta de autoajuda psicológica que combina duas abordagens terapêuticas:
 
 1. **Cartões de Enfrentamento Anti-Pânico** - Uma coleção de 24 afirmações e lembretes para gerenciar ansiedade e ataques de pânico
 2. **Desafio Abraçando a Incerteza** - 18 desafios gamificados para treinar sua tolerância à incerteza no dia a dia
