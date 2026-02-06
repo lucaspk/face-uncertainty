@@ -93,6 +93,30 @@
 
 [data-theme="dark"] .reflection-input:focus {
     background: var(--bg-secondary);
+    border-color: var(--primary);
+}
+
+/* Ensure all buttons have proper contrast in dark mode */
+[data-theme="dark"] .btn {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-primary {
+    color: white;
+}
+
+[data-theme="dark"] .btn-secondary {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-close {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-close:hover {
+    background: var(--border);
+    color: var(--text-primary);
 }
 
 [data-theme="dark"] .progress-bar {
@@ -101,6 +125,20 @@
 
 [data-theme="dark"] .badge.locked {
     background: var(--bg-tertiary);
+}
+
+/* Dark mode card navigation buttons */
+[data-theme="dark"] .card-nav {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .card-nav:hover:not(:disabled) {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
 }
 
 /* ===========================
@@ -430,6 +468,7 @@ body {
     transition: all 0.2s ease;
     flex-shrink: 0;
     box-shadow: 0 2px 8px var(--shadow);
+    color: var(--text-primary);
 }
 
 .card-nav:hover:not(:disabled) {
@@ -1340,6 +1379,21 @@ body {
     color: var(--primary);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark mode button styles */
+[data-theme="dark"] .btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* ===========================
