@@ -147,6 +147,11 @@
                     <h2>Escolha seu próximo passo</h2>
                     <!-- UX: Inviting intro text for action-first hierarchy -->
                     <p class="challenges-intro">Cada desafio é uma oportunidade de descobrir sua força. Comece onde você se sentir mais confortável.</p>
+                    <div class="challenges-filter" role="group" aria-label="Filtrar desafios">
+                        <button type="button" class="challenge-filter-btn active" data-filter="all">Todos</button>
+                        <button type="button" class="challenge-filter-btn" data-filter="completed">Completos</button>
+                        <button type="button" class="challenge-filter-btn" data-filter="pending">Pendentes</button>
+                    </div>
                     <div class="challenges-grid" id="challenges-grid"></div>
                 </div>
             </div>

@@ -82,6 +82,23 @@
     border-color: var(--easy);
 }
 
+[data-theme="dark"] .challenge-filter-btn {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .challenge-filter-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .challenge-filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
 [data-theme="dark"] .modal-overlay {
     background: rgba(0, 0, 0, 0.7);
 }
@@ -658,6 +675,37 @@ body {
     margin-bottom: var(--spacing-xl);
     color: var(--text-secondary);
     font-size: 1rem;
+}
+
+.challenges-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.challenge-filter-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-full);
+    background: white;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.challenge-filter-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.challenge-filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
 }
 
 .challenges-grid {

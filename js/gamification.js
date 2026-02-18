@@ -157,15 +157,30 @@ const gamification = {
         return div;
     },
 
-    // Render challenges grid
+    // Get current challenge filter (all | completed | pending)
+    getChallengeFilter() {
+        const activeBtn = document.querySelector('.challenge-filter-btn.active');
+        return (activeBtn && activeBtn.dataset.filter) || 'all';
+    },
+
+    // Render challenges grid (respects filter: all, completed, pending)
     renderChallenges() {
         const challengesGrid = document.getElementById('challenges-grid');
         if (!challengesGrid) return;
 
         const profile = storage.getProfile();
+        const filter = this.getChallengeFilter();
         challengesGrid.innerHTML = '';
 
-        challenges.forEach(challenge => {
+        const toShow = challenges.filter(challenge => {
+            const isCompleted = profile.completedChallenges.includes(challenge.id);
+            if (filter === 'all') return true;
+            if (filter === 'completed') return isCompleted;
+            if (filter === 'pending') return !isCompleted;
+            return true;
+        });
+
+        toShow.forEach(challenge => {
             const isCompleted = profile.completedChallenges.includes(challenge.id);
             const challengeCard = this.createChallengeCard(challenge, isCompleted);
             challengesGrid.appendChild(challengeCard);
@@ -378,6 +393,15 @@ const gamification = {
                 this.completeChallenge(challengeId);
             });
         }
+
+        // Challenge filter buttons
+        document.querySelectorAll('.challenge-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.challenge-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.renderChallenges();
+            });
+        });
 
         // Export data button
         const exportButton = document.getElementById('export-data');
