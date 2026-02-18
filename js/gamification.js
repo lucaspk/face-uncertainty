@@ -154,26 +154,33 @@ const gamification = {
         return div;
     },
 
-    // Get current challenge filter (all | completed | pending)
+    // Get current status filter (all | completed | pending)
     getChallengeFilter() {
-        const activeBtn = document.querySelector('.challenge-filter-btn.active');
+        const activeBtn = document.querySelector('.challenge-filter-btn[data-filter].active');
         return (activeBtn && activeBtn.dataset.filter) || 'all';
     },
 
-    // Render challenges grid (respects filter: all, completed, pending)
+    // Get current difficulty filter (all | easy | medium | hard)
+    getDifficultyFilter() {
+        const activeBtn = document.querySelector('.challenge-filter-btn[data-difficulty].active');
+        return (activeBtn && activeBtn.dataset.difficulty) || 'all';
+    },
+
+    // Render challenges grid (respects status + difficulty filters)
     renderChallenges() {
         const challengesGrid = document.getElementById('challenges-grid');
         if (!challengesGrid) return;
 
         const profile = storage.getProfile();
-        const filter = this.getChallengeFilter();
+        const statusFilter = this.getChallengeFilter();
+        const difficultyFilter = this.getDifficultyFilter();
         challengesGrid.innerHTML = '';
 
         const toShow = challenges.filter(challenge => {
             const isCompleted = profile.completedChallenges.includes(challenge.id);
-            if (filter === 'all') return true;
-            if (filter === 'completed') return isCompleted;
-            if (filter === 'pending') return !isCompleted;
+            if (statusFilter === 'completed' && !isCompleted) return false;
+            if (statusFilter === 'pending' && isCompleted) return false;
+            if (difficultyFilter !== 'all' && challenge.difficulty !== difficultyFilter) return false;
             return true;
         });
 
@@ -383,12 +390,14 @@ const gamification = {
             });
         }
 
-        // Challenge filter buttons
-        document.querySelectorAll('.challenge-filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.challenge-filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.renderChallenges();
+        // Challenge filter buttons (scope active state to same filter group)
+        document.querySelectorAll('.challenges-filter').forEach(group => {
+            group.querySelectorAll('.challenge-filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    group.querySelectorAll('.challenge-filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.renderChallenges();
+                });
             });
         });
 
