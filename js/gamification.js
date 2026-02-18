@@ -2,17 +2,32 @@
 // Gamification System
 // ===========================
 
+const TOAST_DURATION_MS = 3000;
+const LEVEL_UP_DELAY_MS = 1000;
+const BADGE_NOTIFICATION_BASE_DELAY_MS = 2000;
+const BADGE_NOTIFICATION_STAGGER_MS = 1000;
+
+const PROFILE_NARRATIVE_TIERS = [
+    { maxCompleted: 0, title: 'Pronto para começar? ✨', message: 'Sua jornada de crescimento começa agora. Cada desafio é um passo em direção a uma versão mais corajosa de você.' },
+    { maxCompleted: 1, title: 'Você deu o primeiro passo! 🌱', message: 'O mais difícil já passou. Continue explorando sua coragem, um desafio de cada vez.' },
+    { maxCompleted: 4, title: 'Você está ganhando ritmo! 🚀', message: 'Cada experiência está te tornando mais resiliente. Sua confiança está crescendo.' },
+    { maxCompleted: 9, title: 'Progresso notável! 💪', message: (completed) => `Você já completou ${completed} desafios! Está provando para si mesmo que pode enfrentar a incerteza.` },
+    { maxCompleted: Infinity, title: 'Você é incrível! 🌟', message: (completed, level) => `${completed} desafios completados, nível ${level}. Você está transformando medo em crescimento.` }
+];
+
+const MASTER_NARRATIVE = {
+    title: 'Parabéns, você é um mestre! 👑',
+    message: 'Você completou todos os desafios! Sua jornada provou que você é capaz de abraçar qualquer incerteza.'
+};
+
 const gamification = {
-    // Show toast notification
     showToast(message, type = 'info') {
         const toast = document.getElementById('toast');
+        if (!toast) return;
         toast.textContent = message;
         toast.className = `toast ${type}`;
         toast.classList.add('show');
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
+        setTimeout(() => toast.classList.remove('show'), TOAST_DURATION_MS);
     },
 
     // Show level up notification
@@ -68,7 +83,6 @@ const gamification = {
         this.updateBadgesGrid(profile);
     },
 
-    // UX: Dynamic motivational copy based on user progress
     updateProfileNarrative(profile) {
         const narrativeElement = document.getElementById('profile-narrative');
         if (!narrativeElement) return;
@@ -77,32 +91,15 @@ const gamification = {
         const level = profile.level;
         const totalChallenges = challenges.length;
 
-        let title, message;
-
-        if (completed === 0) {
-            title = "Pronto para começar? ✨";
-            message = "Sua jornada de crescimento começa agora. Cada desafio é um passo em direção a uma versão mais corajosa de você.";
-        } else if (completed === 1) {
-            title = "Você deu o primeiro passo! 🌱";
-            message = "O mais difícil já passou. Continue explorando sua coragem, um desafio de cada vez.";
-        } else if (completed < 5) {
-            title = "Você está ganhando ritmo! 🚀";
-            message = "Cada experiência está te tornando mais resiliente. Sua confiança está crescendo.";
-        } else if (completed < 10) {
-            title = "Progresso notável! 💪";
-            message = `Você já completou ${completed} desafios! Está provando para si mesmo que pode enfrentar a incerteza.`;
-        } else if (completed < totalChallenges) {
-            title = "Você é incrível! 🌟";
-            message = `${completed} desafios completados, nível ${level}. Você está transformando medo em crescimento.`;
-        } else {
-            title = "Parabéns, você é um mestre! 👑";
-            message = "Você completou todos os desafios! Sua jornada provou que você é capaz de abraçar qualquer incerteza.";
+        if (completed >= totalChallenges) {
+            narrativeElement.innerHTML = `<h3>${MASTER_NARRATIVE.title}</h3><p>${MASTER_NARRATIVE.message}</p>`;
+            return;
         }
 
-        narrativeElement.innerHTML = `
-            <h3>${title}</h3>
-            <p>${message}</p>
-        `;
+        const tier = PROFILE_NARRATIVE_TIERS.find(t => completed <= t.maxCompleted) || PROFILE_NARRATIVE_TIERS[PROFILE_NARRATIVE_TIERS.length - 1];
+        const title = tier.title;
+        const message = typeof tier.message === 'function' ? tier.message(completed, level) : tier.message;
+        narrativeElement.innerHTML = `<h3>${title}</h3><p>${message}</p>`;
     },
 
     // Update progress bar for next level
@@ -283,19 +280,14 @@ const gamification = {
             // Show XP notification
             this.showXPGain(result.xpGained);
 
-            // Show level up if applicable
             if (result.leveledUp) {
-                setTimeout(() => {
-                    this.showLevelUp(result.newLevel);
-                }, 1000);
+                setTimeout(() => this.showLevelUp(result.newLevel), LEVEL_UP_DELAY_MS);
             }
 
-            // Show new badges
             if (result.newBadges && result.newBadges.length > 0) {
                 result.newBadges.forEach((badge, index) => {
-                    setTimeout(() => {
-                        this.showBadgeEarned(badge);
-                    }, 2000 + (index * 1000));
+                    const delay = BADGE_NOTIFICATION_BASE_DELAY_MS + index * BADGE_NOTIFICATION_STAGGER_MS;
+                    setTimeout(() => this.showBadgeEarned(badge), delay);
                 });
             }
 
@@ -310,12 +302,10 @@ const gamification = {
         }
     },
 
-    // Export data as JSON file
     exportData() {
-        const data = storage.exportData();
-        const dataStr = JSON.stringify(data, null, 2);
+        const dataToExport = storage.exportData();
+        const dataStr = JSON.stringify(dataToExport, null, 2);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
-
         const url = URL.createObjectURL(dataBlob);
         const link = document.createElement('a');
         link.href = url;
@@ -324,7 +314,6 @@ const gamification = {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-
         this.showToast('Dados exportados com sucesso!', 'success');
     },
 

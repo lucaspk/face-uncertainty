@@ -729,24 +729,25 @@ const badges = [
 // ===========================
 // Level System
 // ===========================
-const levelSystem = {
-    // XP required for each level (cumulative)
-    xpForLevel: (level) => {
-        return level * 100; // Each level requires 100 XP more than the previous
-    },
+const XP_PER_LEVEL = 100;
 
-    // Calculate level from total XP
-    calculateLevel: (xp) => {
+function xpForLevel(level) {
+    return level * XP_PER_LEVEL;
+}
+
+const levelSystem = {
+    xpForLevel,
+
+    calculateLevel(xp) {
         let level = 1;
-        while (xp >= levelSystem.xpForLevel(level)) {
+        while (xp >= xpForLevel(level)) {
             level++;
         }
         return level;
     },
 
-    // Get XP needed for next level
-    xpForNextLevel: (currentLevel) => {
-        return levelSystem.xpForLevel(currentLevel);
+    xpForNextLevel(currentLevel) {
+        return xpForLevel(currentLevel);
     }
 };
 

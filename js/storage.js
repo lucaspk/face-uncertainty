@@ -4,6 +4,38 @@
 
 const STORAGE_KEY = 'face_uncertainty_data';
 
+function countReflectionsWithContent(reflections) {
+    return Object.keys(reflections).filter(key => {
+        const reflection = reflections[key];
+        return Object.values(reflection).some(val =>
+            val && typeof val === 'string' && val.trim().length > 0
+        );
+    }).length;
+}
+
+function countCompletedInCategory(data, category) {
+    return data.completedChallenges.filter(id => {
+        const challenge = challenges.find(c => c.id === id);
+        return challenge && challenge.category === category;
+    }).length;
+}
+
+function meetsBadgeRequirement(badge, data) {
+    const req = badge.requirement;
+    switch (req.type) {
+        case 'challenges_completed':
+            return data.completedChallenges.length >= req.value;
+        case 'reflections_written':
+            return countReflectionsWithContent(data.reflections) >= req.value;
+        case 'level':
+            return data.level >= req.value;
+        case 'category':
+            return countCompletedInCategory(data, req.value) >= req.count;
+        default:
+            return false;
+    }
+}
+
 // Default user profile structure
 const defaultProfile = {
     xp: 0,
@@ -134,52 +166,14 @@ const storage = {
         return data.reflections[challengeId] || null;
     },
 
-    // Check for newly earned badges
     checkBadges(data) {
         const newBadges = [];
-
         badges.forEach(badge => {
-            // Skip if already earned
-            if (data.earnedBadges.includes(badge.id)) {
-                return;
-            }
-
-            let earned = false;
-
-            switch (badge.requirement.type) {
-                case 'challenges_completed':
-                    earned = data.completedChallenges.length >= badge.requirement.value;
-                    break;
-
-                case 'reflections_written':
-                    const reflectionsCount = Object.keys(data.reflections).filter(key => {
-                        const reflection = data.reflections[key];
-                        return Object.values(reflection).some(val =>
-                            val && typeof val === 'string' && val.trim().length > 0
-                        );
-                    }).length;
-                    earned = reflectionsCount >= badge.requirement.value;
-                    break;
-
-                case 'level':
-                    earned = data.level >= badge.requirement.value;
-                    break;
-
-                case 'category':
-                    const categoryCount = data.completedChallenges.filter(id => {
-                        const challenge = challenges.find(c => c.id === id);
-                        return challenge && challenge.category === badge.requirement.value;
-                    }).length;
-                    earned = categoryCount >= badge.requirement.count;
-                    break;
-            }
-
-            if (earned) {
-                data.earnedBadges.push(badge.id);
-                newBadges.push(badge);
-            }
+            if (data.earnedBadges.includes(badge.id)) return;
+            if (!meetsBadgeRequirement(badge, data)) return;
+            data.earnedBadges.push(badge.id);
+            newBadges.push(badge);
         });
-
         return newBadges;
     },
 
@@ -189,15 +183,13 @@ const storage = {
         return badges.filter(badge => data.earnedBadges.includes(badge.id));
     },
 
-    // Export all data as JSON
     exportData() {
         const data = this.getData();
-        const exportData = {
+        return {
             ...data,
             exportedAt: new Date().toISOString(),
             version: '1.0'
         };
-        return exportData;
     },
 
     // Import data from JSON
@@ -244,32 +236,25 @@ const storage = {
         }
     },
 
-    // Get statistics
     getStatistics() {
         const data = this.getData();
-
-        // Category breakdown
         const categoryStats = {};
+        const difficultyStats = { easy: 0, medium: 0, hard: 0 };
+
         data.completedChallenges.forEach(id => {
             const challenge = challenges.find(c => c.id === id);
             if (challenge) {
                 categoryStats[challenge.category] = (categoryStats[challenge.category] || 0) + 1;
-            }
-        });
-
-        // Difficulty breakdown
-        const difficultyStats = { easy: 0, medium: 0, hard: 0 };
-        data.completedChallenges.forEach(id => {
-            const challenge = challenges.find(c => c.id === id);
-            if (challenge) {
                 difficultyStats[challenge.difficulty]++;
             }
         });
 
+        const completedCount = data.completedChallenges.length;
+        const totalCount = challenges.length;
         return {
-            totalChallenges: challenges.length,
-            completedChallenges: data.completedChallenges.length,
-            completionRate: (data.completedChallenges.length / challenges.length * 100).toFixed(1),
+            totalChallenges: totalCount,
+            completedChallenges: completedCount,
+            completionRate: totalCount ? (completedCount / totalCount * 100).toFixed(1) : '0',
             totalReflections: Object.keys(data.reflections).length,
             categoryStats,
             difficultyStats,

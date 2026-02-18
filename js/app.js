@@ -2,6 +2,15 @@
 // Main Application
 // ===========================
 
+const SECTION_REFRESH = {
+    profile: () => gamification.updateProfileDisplay(),
+    challenge: () => gamification.renderChallenges()
+};
+
+const SWIPE_THRESHOLD = 50;
+const CARD_ANIMATION_DURATION_MS = 150;
+const MAX_CARDS_FOR_PROGRESS_DOTS = 30;
+
 const app = {
     currentCardIndex: 0,
     currentSection: 'coping-cards',
@@ -50,12 +59,8 @@ const app = {
             section.classList.add('active');
             this.currentSection = sectionId;
 
-            // Refresh content based on section
-            if (sectionId === 'profile') {
-                gamification.updateProfileDisplay();
-            } else if (sectionId === 'challenge') {
-                gamification.renderChallenges();
-            }
+            const refresh = SECTION_REFRESH[sectionId];
+            if (refresh) refresh();
         }
     },
 
@@ -127,12 +132,11 @@ const app = {
             cardElement.style.transform = 'scale(0.95)';
 
             setTimeout(() => {
-                // Create HTML with icon and text
                 const iconHtml = card.icon ? `<div class="card-icon">${card.icon}</div>` : '';
                 cardElement.innerHTML = `${iconHtml}<div class="card-text">${card.text}</div>`;
                 cardElement.style.opacity = '1';
                 cardElement.style.transform = 'scale(1)';
-            }, 150);
+            }, CARD_ANIMATION_DURATION_MS);
         }
 
         // Update counter
@@ -162,8 +166,7 @@ const app = {
         const dotsContainer = document.getElementById('card-progress-dots');
         if (!dotsContainer) return;
 
-        // Only show dots if we have less than 30 cards
-        if (copingCards.length > 30) {
+        if (copingCards.length > MAX_CARDS_FOR_PROGRESS_DOTS) {
             dotsContainer.style.display = 'none';
             return;
         }
@@ -202,30 +205,14 @@ const app = {
 
         cardContainer.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
-            this.handleSwipe();
+            if (touchEndX < touchStartX - SWIPE_THRESHOLD && this.currentCardIndex < copingCards.length - 1) {
+                this.currentCardIndex++;
+                this.showCard(this.currentCardIndex);
+            } else if (touchEndX > touchStartX + SWIPE_THRESHOLD && this.currentCardIndex > 0) {
+                this.currentCardIndex--;
+                this.showCard(this.currentCardIndex);
+            }
         }, { passive: true });
-
-        const handleSwipe = () => {
-            const swipeThreshold = 50;
-
-            if (touchEndX < touchStartX - swipeThreshold) {
-                // Swipe left - next card
-                if (this.currentCardIndex < copingCards.length - 1) {
-                    this.currentCardIndex++;
-                    this.showCard(this.currentCardIndex);
-                }
-            }
-
-            if (touchEndX > touchStartX + swipeThreshold) {
-                // Swipe right - previous card
-                if (this.currentCardIndex > 0) {
-                    this.currentCardIndex--;
-                    this.showCard(this.currentCardIndex);
-                }
-            }
-        };
-
-        this.handleSwipe = handleSwipe;
     },
 
     // Keyboard navigation
