@@ -103,13 +103,16 @@ const storage = {
             completedAt: new Date().toISOString()
         };
 
-        // Add XP
+        // Persist completion and reflections first so addXP sees them when it calls getData()
+        this.saveData(data);
+
+        // Add XP (getData() inside addXP will now include the new completion)
         const xpResult = this.addXP(challenge.xp);
 
-        // Check for new badges
-        const newBadges = this.checkBadges(data);
-
-        this.saveData(data);
+        // Check for new badges using fresh data (with updated XP/level)
+        const freshData = this.getData();
+        const newBadges = this.checkBadges(freshData);
+        this.saveData(freshData);
 
         return {
             success: true,
