@@ -2,6 +2,8 @@
 
 Uma aplicação web gamificada para desenvolver tolerância à incerteza através de cartões de enfrentamento anti-pânico e desafios diários baseados em Terapia Cognitivo-Comportamental (TCC).
 
+https://lucaspk.github.io/face-uncertainty/
+
 ## 📋 Sobre o Projeto
 
 **Encare a Incerteza** é uma ferramenta de autoajuda psicológica que combina duas abordagens terapêuticas:
