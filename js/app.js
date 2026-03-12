@@ -1,315 +1,245 @@
-// ===========================
-// Main Application
-// ===========================
+(() => {
+  const ns = window.FaceUncertainty || (window.FaceUncertainty = {});
+  const u = ns.utils;
+  const data = ns.data || { copingCards: window.copingCards };
 
-const SECTION_REFRESH = {
-    profile: () => gamification.updateProfileDisplay(),
-    challenge: () => gamification.renderChallenges()
-};
+  const SECTION_REFRESH = {
+    profile: () => ns.gamification.updateProfileDisplay(),
+    challenge: () => ns.gamification.renderChallenges()
+  };
 
-const SWIPE_THRESHOLD = 50;
-const CARD_ANIMATION_DURATION_MS = 150;
-const MAX_CARDS_FOR_PROGRESS_DOTS = 30;
+  const SWIPE_THRESHOLD = 50;
+  const CARD_ANIMATION_DURATION_MS = 150;
+  const MAX_CARDS_FOR_PROGRESS_DOTS = 30;
 
-const app = {
+  const dom = {
+    navLinks: null,
+    sections: null,
+    startButton: null,
+    prevButton: null,
+    nextButton: null,
+    deckCover: null,
+    cardViewer: null,
+    ritualIntro: null,
+    cardContainer: null,
+    copingCard: null,
+    currentCard: null,
+    totalCards: null,
+    dotsContainer: null,
+    themeToggle: null,
+    lightIcon: null,
+    darkIcon: null
+  };
+
+  function cacheDom() {
+    if (!u) return;
+    dom.navLinks = dom.navLinks || u.qsa('.nav-link');
+    dom.sections = dom.sections || u.qsa('.section');
+    dom.startButton = dom.startButton || u.byId('start-cards');
+    dom.prevButton = dom.prevButton || u.qs('.card-nav-prev');
+    dom.nextButton = dom.nextButton || u.qs('.card-nav-next');
+    dom.deckCover = dom.deckCover || u.qs('.deck-cover');
+    dom.cardViewer = dom.cardViewer || u.qs('.card-viewer');
+    dom.ritualIntro = dom.ritualIntro || u.qs('.card-ritual-intro');
+    dom.cardContainer = dom.cardContainer || u.qs('.card-container');
+    dom.copingCard = dom.copingCard || u.qs('.coping-card');
+    dom.currentCard = dom.currentCard || u.qs('.current-card');
+    dom.totalCards = dom.totalCards || u.qs('.total-cards');
+    dom.dotsContainer = dom.dotsContainer || u.byId('card-progress-dots');
+    dom.themeToggle = dom.themeToggle || u.byId('theme-toggle');
+    dom.lightIcon = dom.lightIcon || u.qs('.theme-icon-light');
+    dom.darkIcon = dom.darkIcon || u.qs('.theme-icon-dark');
+  }
+
+  const app = {
     currentCardIndex: 0,
     currentSection: 'coping-cards',
 
-    // Initialize the application
     init() {
-        this.initTheme();
-        this.setupNavigation();
-        this.setupCopingCards();
-        this.setupThemeToggle();
-        gamification.init();
-        this.loadSection(this.currentSection);
+      cacheDom();
+      this.initTheme();
+      this.setupNavigation();
+      this.setupCopingCards();
+      this.setupThemeToggle();
+      this.setupKeyboardNavigation();
+      ns.gamification.init();
+      this.loadSection(this.currentSection);
     },
 
-    // Setup navigation
     setupNavigation() {
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                // Remove active class from all links
-                navLinks.forEach(l => l.classList.remove('active'));
-
-                // Add active class to clicked link
-                link.classList.add('active');
-
-                // Get section
-                const section = link.dataset.section;
-                this.loadSection(section);
-            });
+      cacheDom();
+      dom.navLinks.forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          dom.navLinks.forEach((l) => l.classList.remove('active'));
+          link.classList.add('active');
+          this.loadSection(link.dataset.section);
         });
+      });
     },
 
-    // Load section
     loadSection(sectionId) {
-        // Hide all sections
-        document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('active');
-        });
+      cacheDom();
+      dom.sections.forEach((section) => section.classList.remove('active'));
 
-        // Show selected section
-        const section = document.getElementById(sectionId);
-        if (section) {
-            section.classList.add('active');
-            this.currentSection = sectionId;
+      const section = u.byId(sectionId);
+      if (!section) return;
 
-            const refresh = SECTION_REFRESH[sectionId];
-            if (refresh) refresh();
-        }
+      section.classList.add('active');
+      this.currentSection = sectionId;
+
+      const refresh = SECTION_REFRESH[sectionId];
+      if (refresh) refresh();
     },
 
-    // Setup Coping Cards
+    setCardIndex(index) {
+      const max = data.copingCards.length - 1;
+      const next = u.clamp(index, 0, max);
+      this.currentCardIndex = next;
+      this.showCard(next);
+    },
+
+    stepCard(delta) {
+      this.setCardIndex(this.currentCardIndex + delta);
+    },
+
     setupCopingCards() {
-        const startButton = document.getElementById('start-cards');
-        const prevButton = document.querySelector('.card-nav-prev');
-        const nextButton = document.querySelector('.card-nav-next');
+      cacheDom();
 
-        // Start cards
-        if (startButton) {
-            startButton.addEventListener('click', () => {
-                const deckCover = document.querySelector('.deck-cover');
-                const cardViewer = document.querySelector('.card-viewer');
-                const ritualIntro = document.querySelector('.card-ritual-intro');
+      if (dom.startButton) {
+        dom.startButton.addEventListener('click', () => {
+          if (dom.deckCover && dom.cardViewer) {
+            dom.deckCover.classList.remove('active');
+            dom.cardViewer.classList.add('active');
+          }
+          if (dom.ritualIntro) dom.ritualIntro.style.display = 'block';
 
-                if (deckCover && cardViewer) {
-                    deckCover.classList.remove('active');
-                    cardViewer.classList.add('active');
+          this.setCardIndex(0);
+          this.updateProgressDots(0);
+        });
+      }
 
-                    // UX: Show ritual introduction
-                    if (ritualIntro) {
-                        ritualIntro.style.display = 'block';
-                    }
+      if (dom.prevButton) dom.prevButton.addEventListener('click', () => this.stepCard(-1));
+      if (dom.nextButton) dom.nextButton.addEventListener('click', () => this.stepCard(1));
 
-                    this.currentCardIndex = 0;
-                    this.showCard(this.currentCardIndex);
-                    this.updateProgressDots(this.currentCardIndex);
-                }
-            });
-        }
-
-        // Previous card
-        if (prevButton) {
-            prevButton.addEventListener('click', () => {
-                if (this.currentCardIndex > 0) {
-                    this.currentCardIndex--;
-                    this.showCard(this.currentCardIndex);
-                }
-            });
-        }
-
-        // Next card
-        if (nextButton) {
-            nextButton.addEventListener('click', () => {
-                if (this.currentCardIndex < copingCards.length - 1) {
-                    this.currentCardIndex++;
-                    this.showCard(this.currentCardIndex);
-                }
-            });
-        }
-
-        // Swipe support for mobile
-        this.setupSwipeSupport();
+      this.setupSwipeSupport();
     },
 
-    // Show specific card
     showCard(index) {
-        const card = copingCards[index];
-        const cardElement = document.querySelector('.coping-card');
-        const currentCardElement = document.querySelector('.current-card');
-        const totalCardsElement = document.querySelector('.total-cards');
-        const prevButton = document.querySelector('.card-nav-prev');
-        const nextButton = document.querySelector('.card-nav-next');
+      cacheDom();
+      const card = data.copingCards[index];
+      if (dom.copingCard && card) {
+        dom.copingCard.style.opacity = '0';
+        dom.copingCard.style.transform = 'scale(0.95)';
 
-        if (cardElement && card) {
-            // Add fade animation
-            cardElement.style.opacity = '0';
-            cardElement.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          const iconHtml = card.icon ? `<div class="card-icon">${card.icon}</div>` : '';
+          dom.copingCard.innerHTML = `${iconHtml}<div class="card-text">${card.text}</div>`;
+          dom.copingCard.style.opacity = '1';
+          dom.copingCard.style.transform = 'scale(1)';
+        }, CARD_ANIMATION_DURATION_MS);
+      }
 
-            setTimeout(() => {
-                const iconHtml = card.icon ? `<div class="card-icon">${card.icon}</div>` : '';
-                cardElement.innerHTML = `${iconHtml}<div class="card-text">${card.text}</div>`;
-                cardElement.style.opacity = '1';
-                cardElement.style.transform = 'scale(1)';
-            }, CARD_ANIMATION_DURATION_MS);
-        }
+      if (dom.currentCard) dom.currentCard.textContent = index + 1;
+      if (dom.totalCards) dom.totalCards.textContent = data.copingCards.length;
 
-        // Update counter
-        if (currentCardElement) {
-            currentCardElement.textContent = index + 1;
-        }
+      if (dom.prevButton) dom.prevButton.disabled = index === 0;
+      if (dom.nextButton) dom.nextButton.disabled = index === data.copingCards.length - 1;
 
-        if (totalCardsElement) {
-            totalCardsElement.textContent = copingCards.length;
-        }
-
-        // Update button states
-        if (prevButton) {
-            prevButton.disabled = index === 0;
-        }
-
-        if (nextButton) {
-            nextButton.disabled = index === copingCards.length - 1;
-        }
-
-        // UX: Update progress dots
-        this.updateProgressDots(index);
+      this.updateProgressDots(index);
     },
 
-    // UX: Visual progress indicator using dots
     updateProgressDots(currentIndex) {
-        const dotsContainer = document.getElementById('card-progress-dots');
-        if (!dotsContainer) return;
+      cacheDom();
+      if (!dom.dotsContainer) return;
 
-        if (copingCards.length > MAX_CARDS_FOR_PROGRESS_DOTS) {
-            dotsContainer.style.display = 'none';
-            return;
-        }
+      if (data.copingCards.length > MAX_CARDS_FOR_PROGRESS_DOTS) {
+        dom.dotsContainer.style.display = 'none';
+        return;
+      }
 
-        // Create dots on first call
-        if (dotsContainer.children.length === 0) {
-            copingCards.forEach((_, i) => {
-                const dot = document.createElement('div');
-                dot.className = 'progress-dot';
-                dot.addEventListener('click', () => {
-                    this.currentCardIndex = i;
-                    this.showCard(i);
-                });
-                dotsContainer.appendChild(dot);
-            });
-        }
-
-        // Update active dot
-        const dots = dotsContainer.querySelectorAll('.progress-dot');
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === currentIndex);
+      if (dom.dotsContainer.children.length === 0) {
+        data.copingCards.forEach((_, i) => {
+          const dot = document.createElement('div');
+          dot.className = 'progress-dot';
+          dot.addEventListener('click', () => this.setCardIndex(i));
+          dom.dotsContainer.appendChild(dot);
         });
+      }
+
+      u.qsa('.progress-dot', dom.dotsContainer).forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentIndex);
+      });
     },
 
-    // Setup swipe support for cards
     setupSwipeSupport() {
-        const cardContainer = document.querySelector('.card-container');
-        if (!cardContainer) return;
+      cacheDom();
+      if (!dom.cardContainer) return;
 
-        let touchStartX = 0;
-        let touchEndX = 0;
+      let touchStartX = 0;
+      let touchEndX = 0;
 
-        cardContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
+      dom.cardContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
 
-        cardContainer.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            if (touchEndX < touchStartX - SWIPE_THRESHOLD && this.currentCardIndex < copingCards.length - 1) {
-                this.currentCardIndex++;
-                this.showCard(this.currentCardIndex);
-            } else if (touchEndX > touchStartX + SWIPE_THRESHOLD && this.currentCardIndex > 0) {
-                this.currentCardIndex--;
-                this.showCard(this.currentCardIndex);
-            }
-        }, { passive: true });
+      dom.cardContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchEndX < touchStartX - SWIPE_THRESHOLD) this.stepCard(1);
+        else if (touchEndX > touchStartX + SWIPE_THRESHOLD) this.stepCard(-1);
+      }, { passive: true });
     },
 
-    // Keyboard navigation
     setupKeyboardNavigation() {
-        document.addEventListener('keydown', (e) => {
-            // Only in coping cards section
-            if (this.currentSection !== 'coping-cards') return;
+      document.addEventListener('keydown', (e) => {
+        if (this.currentSection !== 'coping-cards') return;
+        if (!u.qs('.card-viewer.active')) return;
 
-            // Check if card viewer is active
-            const cardViewer = document.querySelector('.card-viewer.active');
-            if (!cardViewer) return;
-
-            if (e.key === 'ArrowLeft') {
-                // Previous card
-                if (this.currentCardIndex > 0) {
-                    this.currentCardIndex--;
-                    this.showCard(this.currentCardIndex);
-                }
-            } else if (e.key === 'ArrowRight') {
-                // Next card
-                if (this.currentCardIndex < copingCards.length - 1) {
-                    this.currentCardIndex++;
-                    this.showCard(this.currentCardIndex);
-                }
-            }
-        });
+        if (e.key === 'ArrowLeft') this.stepCard(-1);
+        else if (e.key === 'ArrowRight') this.stepCard(1);
+      });
     },
 
-    // Initialize theme from localStorage or system preference
     initTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        let theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-        this.setTheme(theme);
+      const savedTheme = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+      this.setTheme(theme);
     },
 
-    // Set theme
     setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        
-        // Update toggle button icons
-        const lightIcon = document.querySelector('.theme-icon-light');
-        const darkIcon = document.querySelector('.theme-icon-dark');
-        
-        if (lightIcon && darkIcon) {
-            if (theme === 'dark') {
-                lightIcon.style.display = 'none';
-                darkIcon.style.display = 'block';
-            } else {
-                lightIcon.style.display = 'block';
-                darkIcon.style.display = 'none';
-            }
-        }
+      cacheDom();
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+
+      if (dom.lightIcon && dom.darkIcon) {
+        const isDark = theme === 'dark';
+        dom.lightIcon.style.display = isDark ? 'none' : 'block';
+        dom.darkIcon.style.display = isDark ? 'block' : 'none';
+      }
     },
 
-    // Setup theme toggle button
     setupThemeToggle() {
-        const themeToggle = document.getElementById('theme-toggle');
-        if (!themeToggle) return;
+      cacheDom();
+      if (!dom.themeToggle) return;
 
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            this.setTheme(newTheme);
-        });
+      dom.themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        this.setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+      });
     }
-};
+  };
 
-// ===========================
-// Initialize on DOM ready
-// ===========================
-document.addEventListener('DOMContentLoaded', () => {
+  ns.app = app;
+  window.app = app;
+
+  document.addEventListener('DOMContentLoaded', () => {
     app.init();
-    app.setupKeyboardNavigation();
-
-    // Add smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
+    if (ns.DEBUG) console.log('App ready');
+  });
 
-    // Log welcome message
-    console.log('%cFace a Incerteza 🌱', 'font-size: 20px; font-weight: bold; color: #6366f1;');
-    console.log('Aplicação carregada com sucesso!');
-});
-
-// ===========================
-// Service Worker Registration (Optional)
-// ===========================
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        // Uncomment to enable offline support
-        // navigator.serviceWorker.register('/sw.js')
-        //     .then(registration => {
-        //         console.log('ServiceWorker registered:', registration);
-        //     })
-        //     .catch(error => {
-        //         console.log('ServiceWorker registration failed:', error);
-        //     });
-    });
-}
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {});
+  }
+})();

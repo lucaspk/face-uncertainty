@@ -1,6 +1,6 @@
-// ===========================
-// Coping Cards Data
-// ===========================
+(() => {
+const ns = window.FaceUncertainty || (window.FaceUncertainty = {});
+
 const copingCards = [
     {
         id: 1,
@@ -232,9 +232,6 @@ const copingCards = [
     }
 ];
 
-// ===========================
-// Challenges Data
-// ===========================
 const challenges = [
     {
         id: 1,
@@ -638,9 +635,6 @@ const challenges = [
     }    
 ];
 
-// ===========================
-// Reflection Questions
-// ===========================
 const reflectionQuestions = [
     {
         key: "learned",
@@ -664,9 +658,6 @@ const reflectionQuestions = [
     }
 ];
 
-// ===========================
-// Badges/Achievements Data
-// ===========================
 const badges = [
     {
         id: 1,
@@ -694,7 +685,7 @@ const badges = [
         name: "Mestre da Incerteza",
         description: "Complete todos os desafios",
         icon: "👑",
-        requirement: { type: "challenges_completed", value: 18 }
+        requirement: { type: "challenges_completed", value: challenges.length }
     },
     {
         id: 5,
@@ -726,9 +717,6 @@ const badges = [
     }
 ];
 
-// ===========================
-// Level System
-// ===========================
 const XP_PER_LEVEL = 100;
 
 function xpForLevel(level) {
@@ -751,13 +739,15 @@ const levelSystem = {
     }
 };
 
-// Export data for use in other modules
+ns.data = { copingCards, challenges, reflectionQuestions, badges, levelSystem };
+
+window.copingCards = copingCards;
+window.challenges = challenges;
+window.reflectionQuestions = reflectionQuestions;
+window.badges = badges;
+window.levelSystem = levelSystem;
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        copingCards,
-        challenges,
-        reflectionQuestions,
-        badges,
-        levelSystem
-    };
+  module.exports = ns.data;
 }
+})();
